@@ -1,0 +1,36 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - firstApp-network
+      - secondApp-network
+      - thirdApp-network
+
+  certbot:
+    image: certbot/certbot
+    entrypoint: "/bin/sh -c 'certbot certonly --webroot --webroot-path=/var/www/certbot --email {your-email} --agree-tos --no-eff-email --keep-until-expiring -d {your-domain} -d {your-domain}'"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - firstApp-network
+      - secondApp-network
+      - thirdApp-network
+
+networks:
+  firstApp-network:
+    external: true
+  secondApp-network:
+    external: true
+  thirdApp-network:
+    external: true
